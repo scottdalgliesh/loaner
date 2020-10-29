@@ -29,8 +29,12 @@ while bal_close[ind] > 0:
     bal_open.append(bal_close[ind-1])
     int_acc.append(bal_open[ind]*inter/12)
     contrib.append(payme)
+    if bal_open[ind] + int_acc[ind] < contrib[ind]:
+        contrib[ind] = bal_open[ind] + int_acc[ind]
     bal_close.append(bal_open[ind] + int_acc[ind] - contrib[ind])
 
+# repayment summary table
+pd.options.display.float_format = "${:,.2f}".format
 sum_df = pd.DataFrame(
     {
         "Date": date,
@@ -40,5 +44,19 @@ sum_df = pd.DataFrame(
         "Closing Balance": bal_close
     }
 )
+tot_int = sum_df['Accrued Interest'].sum()
+tot_pay = sum_df["Contribution"].sum()
 
-print(sum_df)
+# output results
+out = (f"Loan Summary\n"
+       "------------\n"
+       f"Principal:         ${princ:.2f}\n"
+       f"Interest rate:     {inter:.2f}%\n"
+       f"Monthly Payment:   ${payme:.2f}\n"
+       f"Repayment Period:  {len(sum_df)} weeks\n"
+       f"Total interest:    ${tot_int:.2f}\n"
+       f"Total paid:        ${tot_pay:.2f}\n\n\n"
+       f"Repayment summary table:\n"
+       "------------------------\n"
+       f"{sum_df}")
+print(out)
