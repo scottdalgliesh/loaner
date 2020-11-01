@@ -13,19 +13,19 @@ class Loan:
     """Creates a Loan object. Used for assessment of loan repayment options."""
 
     def __init__(self, princ: float, inter: float,
-                 payme: float, start: Optional[Tuple[int]] = None) -> None:
+                 payme: float, start: Optional[Tuple[int, int, int]] = None) -> None:
         self.princ = princ
         self.inter = inter
         self.payme = payme
-        self.start = start
+        # self.start = start
 
-        self._validate_princ()
-        self._validate_inter()
-        self._validate_payme()
-        if self.start is None:
+        self._validate_princ(princ)
+        self._validate_inter(inter)
+        self._validate_payme(payme)
+        if start is None:
             self.start = date.today()
-        elif self._validate_start():
-            self.start = date(year=start[2], month=start[1], day=start[0])
+        elif self._validate_start(start):
+            self.start = date(year=start[2], month=start[0], day=start[1])
 
         pd.options.display.float_format = "${:,.2f}".format
         pd.options.display.width = 0
@@ -33,27 +33,31 @@ class Loan:
         self.tot_int = round(self.table['Accrued Interest'].sum(), 2)
         self.tot_pay = round(self.table["Contribution"].sum(), 2)
 
-    def _validate_princ(self) -> None:
+    @staticmethod
+    def _validate_princ(princ) -> None:
         """Validate principal input."""
-        if self.princ <= 0:
+        if princ <= 0:
             raise ValueError("Principal must be greater than zero.")
 
-    def _validate_inter(self) -> None:
+    @staticmethod
+    def _validate_inter(inter) -> None:
         """Validate interest rate input."""
-        if not 0 < self.inter < 1:
+        if not 0 < inter < 1:
             raise ValueError("Interest must be between 0 and 1.")
 
-    def _validate_payme(self) -> None:
+    @staticmethod
+    def _validate_payme(payme) -> None:
         """Validate payment input."""
-        if self.payme <= 0:
+        if payme <= 0:
             raise ValueError("Payment must be greater than 0.")
 
-    def _validate_start(self) -> bool:
+    @staticmethod
+    def _validate_start(start) -> bool:
         """Validate start date input."""
-        if not len(self.start) == 3:
+        if not len(start) == 3:
             raise ValueError("Date must be specified as (mm,dd,yyyy).")
         try:
-            date(year=self.start[2], month=self.start[1], day=self.start[0])
+            date(year=start[2], month=start[0], day=start[1])
         except ValueError:
             raise ValueError("Date must be specified as (mm,dd,yyyy).")
         return True
