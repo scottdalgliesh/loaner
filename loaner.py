@@ -10,35 +10,53 @@ from dateutil.relativedelta import relativedelta
 
 
 class Loan:
-    """Creates a Loan object. Used for assessment of loan repayment options.
-    """
+    """Creates a Loan object. Used for assessment of loan repayment options."""
 
     def __init__(self, princ: float, inter: float,
                  payme: float, start: Optional[Tuple[int]] = None) -> None:
-        if princ <= 0:
-            raise ValueError("Principal must be greater than zero.")
         self.princ = princ
-
-        if not 0 < inter < 1:
-            raise ValueError("Interest must be between 0 and 1.")
         self.inter = inter
-
-        if payme <= 0:
-            raise ValueError("Payment must be greater than 0.")
         self.payme = payme
+        self.start = start
 
-        if start is None:
+        self._validate_princ()
+        self._validate_inter()
+        self._validate_payme()
+        if self.start is None:
             self.start = date.today()
-        elif self._check_start_date(start):
+        elif self._validate_start():
             self.start = date(year=start[2], month=start[1], day=start[0])
-        else:
-            raise ValueError("Date must be specified as (mm,dd,yyyy).")
 
         pd.options.display.float_format = "${:,.2f}".format
         pd.options.display.width = 0
         self.table = self._calculate_payment_schedule()
         self.tot_int = round(self.table['Accrued Interest'].sum(), 2)
         self.tot_pay = round(self.table["Contribution"].sum(), 2)
+
+    def _validate_princ(self) -> None:
+        """Validate principal input."""
+        if self.princ <= 0:
+            raise ValueError("Principal must be greater than zero.")
+
+    def _validate_inter(self) -> None:
+        """Validate interest rate input."""
+        if not 0 < self.inter < 1:
+            raise ValueError("Interest must be between 0 and 1.")
+
+    def _validate_payme(self) -> None:
+        """Validate payment input."""
+        if self.payme <= 0:
+            raise ValueError("Payment must be greater than 0.")
+
+    def _validate_start(self) -> bool:
+        """Validate start date input."""
+        if not len(self.start) == 3:
+            raise ValueError("Date must be specified as (mm,dd,yyyy).")
+        try:
+            date(year=self.start[2], month=self.start[1], day=self.start[0])
+        except ValueError:
+            raise ValueError("Date must be specified as (mm,dd,yyyy).")
+        return True
 
     def _calculate_payment_schedule(self) -> pd.DataFrame:
         """Calculate a payment summary table for the loan.
@@ -79,28 +97,6 @@ class Loan:
         )
         return sum_df
 
-    @staticmethod
-    def _check_start_date(start) -> bool:
-        """Validate start date input.
-
-        Parameters
-        ----------
-        start : Tuple
-            Start date entered as (mm,dd,yyyy)
-
-        Returns
-        -------
-        bool
-        """
-
-        if not len(start) == 3:
-            return False
-        try:
-            date(year=start[2], month=start[1], day=start[0])
-        except ValueError:
-            return False
-        return True
-
     def __repr__(self):
         """convert to formal string, for repr()."""
         date_str = self.start.strftime("%m,%d,%Y")
@@ -113,9 +109,9 @@ class Loan:
         msg = ("Loan Summary\n"
                "------------\n"
                f"Principal:         ${self.princ:.2f}\n"
-               f"Interest rate:     {self.inter:.2f}%\n"
+               f"Interest rate:     {self.inter*100:.2f}%\n"
                f"Monthly Payment:   ${self.payme:.2f}\n"
-               f"Start Date:        {self.start.strftime('%m,%d,%Y')}\n"
+               f"Start Date:        {self.start.strftime('%m-%d-%Y')}\n"
                f"Repayment Period:  {len(self.table)} weeks\n"
                f"Total interest:    ${self.tot_int:.2f}\n"
                f"Total paid:        ${self.tot_pay:.2f}\n\n\n"
