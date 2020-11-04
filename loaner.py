@@ -10,14 +10,18 @@ from dateutil.relativedelta import relativedelta
 
 #TODO: refactor class using dataclass decorator
 
+def _rnd(value: float) -> float:
+    """Round value to 2 decimal places."""
+    return round(value, 2)
+
 class Loan:
     """Creates a Loan object. Used for assessment of loan repayment options."""
 
     def __init__(self, princ: float, inter: float,
                  payme: float, start: Optional[Tuple[int, int, int]] = None) -> None:
-        self.princ = princ
-        self.inter = inter
-        self.payme = payme
+        self.princ = _rnd(princ)
+        self.inter = _rnd(inter)
+        self.payme = _rnd(payme)
         # self.start = start
 
         self._validate_princ(princ)
@@ -76,7 +80,7 @@ class Loan:
         ind = 0
         pay_date = [self.start]
         bal_open = [self.princ]
-        int_acc = [bal_open[ind]*self.inter/12]
+        int_acc = [_rnd(bal_open[ind]*self.inter/12)]
         contrib = [self.payme]
         bal_close = [bal_open[0] + int_acc[0] - contrib[0]]
 
@@ -85,7 +89,7 @@ class Loan:
             ind += 1
             pay_date.append(pay_date[ind-1] + relativedelta(months=+1))
             bal_open.append(bal_close[ind-1])
-            int_acc.append(bal_open[ind]*self.inter/12)
+            int_acc.append(_rnd(bal_open[ind]*self.inter/12))
             contrib.append(self.payme)
             if bal_open[ind] + int_acc[ind] < contrib[ind]:
                 contrib[ind] = bal_open[ind] + int_acc[ind]
