@@ -5,6 +5,7 @@ import pytest
 
 from loaner import Loan
 
+#TODO: add tests for loan object
 
 class TestValidation:
     """Input validation unit tests."""
@@ -76,3 +77,19 @@ class TestValidation:
         else:
             with pytest.raises(ValueError):
                 func(inp)
+
+
+class TestCalculation:
+    """Interest calculation unit tests."""
+
+    def test_calculate_payment_schedule(self):
+        test_loan = Loan(
+            princ=10_000,
+            inter=0.06,
+            payme=193.33,
+            start=(1, 1, 2020)
+        )
+        delta_int = abs(test_loan.tot_int - 1599.68)
+        assert delta_int == 0
+        # TODO: modify Loan._calculate_payment_schedule() to correctly round
+        # interest and payments to 2 decimal places

@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 # - compound interest
 # - monthly payment / compunding
 
+#TODO: refactor class using dataclass decorator
 
 class Loan:
     """Creates a Loan object. Used for assessment of loan repayment options."""
