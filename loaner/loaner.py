@@ -8,7 +8,6 @@ from dateutil.relativedelta import relativedelta
 # - compound interest
 # - monthly payment / compunding
 
-#TODO: refactor class using dataclass decorator
 
 def _rnd(value: float) -> float:
     """Round value to 2 decimal places."""
@@ -63,8 +62,8 @@ class Loan:
             raise ValueError("Date must be specified as (mm,dd,yyyy).")
         try:
             date(year=start[2], month=start[0], day=start[1])
-        except ValueError:
-            raise ValueError("Date must be specified as (mm,dd,yyyy).")
+        except ValueError as invalid_date:
+            raise ValueError("Date must be specified as (mm,dd,yyyy).") from invalid_date
         return True
 
     def _calculate_payment_schedule(self) -> pd.DataFrame:
