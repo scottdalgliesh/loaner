@@ -3,9 +3,9 @@ from typing import Any, Callable
 
 import pytest
 
-from loaner import Loan
+from loaner.loaner import Loan  # pylint:disable=[import-error]
 
-#TODO: add tests for loan object
+
 
 class TestValidation:
     """Input validation unit tests."""
@@ -82,14 +82,20 @@ class TestValidation:
 class TestCalculation:
     """Interest calculation unit tests."""
 
-    def test_calculate_payment_schedule(self):
+    # test case taken from: https://www.calculator.net/loan-calculator.html
+    test_calc_inp = [
+        pytest.param(10_000, 0.06, 193.33, 1599.68, 60, id="basic_1"),
+        pytest.param(25_000, 0.06, 1108.02, 1592.37, 24, id="basic_2"),
+        pytest.param(10_000, 0.06, 10_050, 50, 1, id="single_period")
+    ]
+
+    @pytest.mark.parametrize("princ, inter, payme, tot_int, period", test_calc_inp)
+    def test_calculate_payment_schedule(self, princ, inter, payme, tot_int, period):
         test_loan = Loan(
-            princ=10_000,
-            inter=0.06,
-            payme=193.33,
+            princ=princ,
+            inter=inter,
+            payme=payme,
             start=(1, 1, 2020)
         )
-        delta_int = abs(test_loan.tot_int - 1599.68)
-        assert delta_int == 0
-        # TODO: modify Loan._calculate_payment_schedule() to correctly round
-        # interest and payments to 2 decimal places
+        assert test_loan.tot_int == tot_int
+        assert len(test_loan.table) == period
