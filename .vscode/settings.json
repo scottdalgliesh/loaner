@@ -6,4 +6,6 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
+    "python.pythonPath": "C:\\Users\\sdalg\\anaconda3\\envs\\loaner\\python.exe",
+    "python.languageServer": "Pylance"
 }
