@@ -99,3 +99,29 @@ class TestCalculation:
         )
         assert test_loan.tot_int == tot_int
         assert len(test_loan.table) == period
+
+
+class TestMisc:
+    """Misc tests for Loan object"""
+
+    @pytest.fixture
+    def sample_loan(self):
+        return Loan(10_000, 0.06, 1000, (1, 1, 2020))
+
+    def test_str(self, sample_loan):
+        sample_repr = "Loan(princ=10000, inter=0.06, payme=1000, start=(1, 1, 2020))"
+        assert sample_loan.__repr__() == sample_repr
+
+    def test_repr(self, sample_loan):
+        sample_str = (
+            "Loan Summary\n"
+            "------------\n"
+            "Principal:         $10000.00\n"
+            "Interest rate:     6.00%\n"
+            "Monthly Payment:   $1000.00\n"
+            "Start Date:        01-01-2020\n"
+            "Repayment Period:  11 weeks\n"
+            "Total interest:    $284.80\n"
+            "Total paid:        $10284.80\n\n\n"
+        )
+        assert sample_loan.__str__() == sample_str
