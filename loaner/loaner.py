@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import date
 from typing import Optional, Tuple
 
@@ -13,23 +14,24 @@ def _rnd(value: float) -> float:
     """Round value to 2 decimal places."""
     return round(value, 2)
 
+
+@dataclass
 class Loan:
     """Creates a Loan object. Used for assessment of loan repayment options."""
+    princ: float
+    inter: float
+    payme: float
+    start: Optional[Tuple[int, int, int]] = None
 
-    def __init__(self, princ: float, inter: float,
-                 payme: float, start: Optional[Tuple[int, int, int]] = None) -> None:
-        self.princ = _rnd(princ)
-        self.inter = _rnd(inter)
-        self.payme = _rnd(payme)
-        # self.start = start
-
-        self._validate_princ(princ)
-        self._validate_inter(inter)
-        self._validate_payme(payme)
-        if start is None:
-            self.start = date.today()
-        elif self._validate_start(start):
-            self.start = date(year=start[2], month=start[0], day=start[1])
+    def __post_init__(self) -> None:
+        self._validate_princ(self.princ)
+        self._validate_inter(self.inter)
+        self._validate_payme(self.payme)
+        if self.start is None:
+            self.start_date: date = date.today()
+        elif self._validate_start(self.start):
+            self.start_date = date(
+                year=self.start[2], month=self.start[0], day=self.start[1])
 
         pd.options.display.float_format = "${:,.2f}".format
         pd.options.display.width = 0
@@ -77,7 +79,7 @@ class Loan:
 
         # initialize (first month)
         ind = 0
-        pay_date = [self.start]
+        pay_date = [self.start_date]
         bal_open = [self.princ]
         int_acc = [_rnd(bal_open[ind]*self.inter/12)]
         contrib = [self.payme]
@@ -105,12 +107,6 @@ class Loan:
         )
         return sum_df
 
-    def __repr__(self):
-        """convert to formal string, for repr()."""
-        date_str = self.start.strftime("%m,%d,%Y")
-        msg = (f"Loan(princ={self.princ}, inter={self.inter}"
-               f", payme={self.payme}, start=({date_str}))")
-        return msg
 
     def __str__(self):
         """convert to string representation"""
@@ -119,11 +115,9 @@ class Loan:
                f"Principal:         ${self.princ:.2f}\n"
                f"Interest rate:     {self.inter*100:.2f}%\n"
                f"Monthly Payment:   ${self.payme:.2f}\n"
-               f"Start Date:        {self.start.strftime('%m-%d-%Y')}\n"
+               f"Start Date:        {self.start_date.strftime('%m-%d-%Y')}\n"
                f"Repayment Period:  {len(self.table)} weeks\n"
                f"Total interest:    ${self.tot_int:.2f}\n"
                f"Total paid:        ${self.tot_pay:.2f}\n\n\n"
-               f"Repayment summary table:\n"
-               "------------------------\n"
-               f"{self.table}")
+        )
         return msg
