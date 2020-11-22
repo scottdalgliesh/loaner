@@ -3,3 +3,4 @@ debug.log
 .ropeproject
 .coverage
 cov.xml
+.venv
