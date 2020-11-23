@@ -100,6 +100,18 @@ class TestCalculation:
         assert test_loan.tot_int == tot_int
         assert len(test_loan.table) == period
 
+    def test_calculate_pv_table(self):
+        test_loan = Loan(
+            princ=10_000,
+            inter=0.06,
+            payme=193.33,
+            start=(1, 1, 2020),
+            infl=0.015
+        )
+        assert test_loan.pv_table.loc[11,"Inflation Factor"] == f"{(1-test_loan.infl)**(1):.2%}"
+        assert test_loan.pv_table.loc[23,"Inflation Factor"] == f"{(1-test_loan.infl)**(2):.2%}"
+        assert test_loan.pv_table.loc[59,"Inflation Factor"] == f"{(1-test_loan.infl)**(5):.2%}"
+
 
 class TestMisc:
     """Misc tests for Loan object"""
@@ -109,7 +121,7 @@ class TestMisc:
         return Loan(10_000, 0.06, 1000, (1, 1, 2020))
 
     def test_str(self, sample_loan):
-        sample_repr = "Loan(princ=10000, inter=0.06, payme=1000, start=(1, 1, 2020))"
+        sample_repr = "Loan(princ=10000, inter=0.06, payme=1000, start=(1, 1, 2020), infl=0.015)"
         assert sample_loan.__repr__() == sample_repr
 
     def test_repr(self, sample_loan):

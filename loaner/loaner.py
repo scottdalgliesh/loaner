@@ -22,6 +22,7 @@ class Loan:
     inter: float
     payme: float
     start: Optional[Tuple[int, int, int]] = None
+    infl: float = 0.015
 
     def __post_init__(self) -> None:
         self._validate_princ(self.princ)
@@ -38,6 +39,10 @@ class Loan:
         self.table = self._calculate_payment_schedule()
         self.tot_int = round(self.table['Accrued Interest'].sum(), 2)
         self.tot_pay = round(self.table["Contribution"].sum(), 2)
+
+        self.pv_table = self._calculate_pv_table()
+        self.pv_int = _rnd(self.pv_table["pv Interest"].sum())
+        self.pv_pay = _rnd(self.pv_table["pv Contrib"].sum())
 
     @staticmethod
     def _validate_princ(princ) -> None:
@@ -107,6 +112,13 @@ class Loan:
         )
         return sum_df
 
+    def _calculate_pv_table(self):
+        table = self.table.copy()
+        table["Inflation Factor"] = (1-self.infl)**((table.index+1)/12)
+        table["pv Interest"] = (1-table["Inflation Factor"])*table["Accrued Interest"]
+        table["pv Contrib"] = (1-table["Inflation Factor"])*table["Contribution"]
+        table["Inflation Factor"] = table["Inflation Factor"].map("{:.2%}".format)
+        return table
 
     def __str__(self):
         """convert to string representation"""
