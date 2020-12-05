@@ -109,8 +109,9 @@ class TestCalculation:
             infl=0.015
         )
         assert test_loan.pv_table.loc[11,"Inflation Factor"] == f"{(1+test_loan.infl)**(-1):.2%}"
-        assert test_loan.pv_table.loc[23,"Inflation Factor"] == f"{(1+test_loan.infl)**(-2):.2%}"
         assert test_loan.pv_table.loc[59,"Inflation Factor"] == f"{(1+test_loan.infl)**(-5):.2%}"
+        assert test_loan.pv_int == 1558.47
+        assert test_loan.pv_pay == 11171.51
 
 
 class TestMisc:
@@ -120,19 +121,19 @@ class TestMisc:
     def sample_loan(self):
         return Loan(10_000, 0.06, 1000, (1, 1, 2020))
 
-    def test_str(self, sample_loan):
+    def test_repr(self, sample_loan):
         sample_repr = "Loan(princ=10000, inter=0.06, payme=1000, start=(1, 1, 2020), infl=0.015)"
         assert sample_loan.__repr__() == sample_repr
 
-    def test_repr(self, sample_loan):
+    def test_str(self, sample_loan):
         sample_str = (
             "Loan Summary\n"
             "------------\n"
             "Principal:         $10000.00\n"
             "Interest rate:     6.00%\n"
-            "Monthly Payment:   $1000.00\n"
-            "Start Date:        01-01-2020\n"
-            "Repayment Period:  11 weeks\n"
+            "Monthly payment:   $1000.00\n"
+            "Start date:        01-01-2020\n"
+            "Repayment period:  11 months\n"
             "Total interest:    $284.80\n"
             "Total paid:        $10284.80\n\n\n"
         )
