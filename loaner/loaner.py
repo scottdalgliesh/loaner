@@ -39,6 +39,8 @@ class Loan:
         self.table = self._calculate_payment_schedule()
         self.tot_int = round(self.table['Accrued Interest'].sum(), 2)
         self.tot_pay = round(self.table["Contribution"].sum(), 2)
+        self.period = len(self.table)
+        self.end_date = self.table.iloc[-1].loc["Payment Date"]
 
         self.pv_table = self._calculate_pv_table()
         self.pv_int = _rnd(self.pv_table["pv Interest"].sum())
@@ -126,9 +128,9 @@ class Loan:
                "------------\n"
                f"Principal:         ${self.princ:.2f}\n"
                f"Interest rate:     {self.inter*100:.2f}%\n"
-               f"Monthly Payment:   ${self.payme:.2f}\n"
-               f"Start Date:        {self.start_date.strftime('%m-%d-%Y')}\n"
-               f"Repayment Period:  {len(self.table)} weeks\n"
+               f"Monthly payment:   ${self.payme:.2f}\n"
+               f"Start date:        {self.start_date.strftime('%m-%d-%Y')}\n"
+               f"Repayment period:  {self.period} months\n"
                f"Total interest:    ${self.tot_int:.2f}\n"
                f"Total paid:        ${self.tot_pay:.2f}\n\n\n"
         )
