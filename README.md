@@ -2,7 +2,6 @@
 Loaner is a utility package containing tools for comparative evaluation of loan offers.
 
 ## Basic Usage
----
 ```Python
 from loaner import Loan
 
