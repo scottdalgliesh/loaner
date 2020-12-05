@@ -108,9 +108,9 @@ class TestCalculation:
             start=(1, 1, 2020),
             infl=0.015
         )
-        assert test_loan.pv_table.loc[11,"Inflation Factor"] == f"{(1-test_loan.infl)**(1):.2%}"
-        assert test_loan.pv_table.loc[23,"Inflation Factor"] == f"{(1-test_loan.infl)**(2):.2%}"
-        assert test_loan.pv_table.loc[59,"Inflation Factor"] == f"{(1-test_loan.infl)**(5):.2%}"
+        assert test_loan.pv_table.loc[11,"Inflation Factor"] == f"{(1+test_loan.infl)**(-1):.2%}"
+        assert test_loan.pv_table.loc[23,"Inflation Factor"] == f"{(1+test_loan.infl)**(-2):.2%}"
+        assert test_loan.pv_table.loc[59,"Inflation Factor"] == f"{(1+test_loan.infl)**(-5):.2%}"
 
 
 class TestMisc:

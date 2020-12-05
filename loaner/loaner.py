@@ -114,9 +114,9 @@ class Loan:
 
     def _calculate_pv_table(self):
         table = self.table.copy()
-        table["Inflation Factor"] = (1-self.infl)**((table.index+1)/12)
-        table["pv Interest"] = (1-table["Inflation Factor"])*table["Accrued Interest"]
-        table["pv Contrib"] = (1-table["Inflation Factor"])*table["Contribution"]
+        table["Inflation Factor"] = 1/(1+self.infl)**((table.index+1)/12)
+        table["pv Interest"] = table["Inflation Factor"]*table["Accrued Interest"]
+        table["pv Contrib"] = table["Inflation Factor"]*table["Contribution"]
         table["Inflation Factor"] = table["Inflation Factor"].map("{:.2%}".format)
         return table
 
